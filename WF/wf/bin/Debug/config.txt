@@ -1,0 +1,26 @@
+useCV,true
+useParallel,true
+nCv,5
+setInhyperCube,true
+nonLinearHopping,true
+dbPath,C:\Users\Oren E\Google Drive\teaching\mlMath\WF\db\parkinson
+resultsPath,D:\data\wfResltsCourse\parkinson1TreeDBG2
+approxThresh,0
+minNodeSize,1
+partitionType,2
+useContNorms,true
+boundLevelDepth,5000
+errTypeTest,2
+trainingPercentTB,
+nTrees,1
+nFeaturesStr,sqrt
+bagginPercent,0.8
+saveTrees,true
+runOneTreeCB,
+testRF,true
+evaluateSmoothness,true
+testWf,true
+fixThreshold,-1
+hopping,5
+m_terms,-1
+setClassification,false
