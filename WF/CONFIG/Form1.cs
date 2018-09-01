@@ -203,6 +203,7 @@ namespace DataSetsSparsity
             u_config.setInhyperCube = setInhyperCube.Checked ? "true" : "false";
             u_config.nonLinearHopping = useRF.Checked ? "true" : "false";
             u_config.testRF = testRF.Checked ? "true" : "false";
+            u_config.setClassification = setClassification.Checked ? "true" : "false";
             u_config.useIsotropicSplits = useIsotropicSplits.Checked ? "true" : "false";
             u_config.useLinearRegression = useLinearRegression.Checked ? "true" : "false";
             u_config.useSVMRegression = useSVMRegression.Checked ? "true" : "false";
