@@ -81,6 +81,14 @@ namespace DataSetsSparsity
                     m_terms = values[1];
                 else if (values[0] == "setClassification")
                     setClassification = values[1];
+                else if (values[0] == "useIsotropicSplits")
+                    useIsotropicSplits = values[1];
+                else if (values[0] == "useLinearRegression")
+                    useLinearRegression = values[1];
+                else if (values[0] == "useSVMRegression")
+                    useSVMRegression = values[1];
+                else if (values[0] == "useSVMClassification")
+                    useSVMClassification = values[1];
 
             }
             sr.Close();
@@ -128,6 +136,10 @@ namespace DataSetsSparsity
             sw.WriteLine("hopping" + "," + hopping);
             sw.WriteLine("m_terms" + "," + m_terms);
             sw.WriteLine("setClassification" + "," + setClassification);
+            sw.WriteLine("useIsotropicSplits" + "," + useIsotropicSplits);
+            sw.WriteLine("useLinearRegression" + "," + useLinearRegression);
+            sw.WriteLine("useSVMRegression" + "," + useSVMRegression);
+            sw.WriteLine("useSVMClassification" + "," + useSVMClassification);
 
             sw.Close();
         }
@@ -160,8 +172,12 @@ namespace DataSetsSparsity
         public string fixThreshold;
         public string hopping;
         public string m_terms;
-        public string setClassification; 
-     }
+        public string setClassification;
+        public string useIsotropicSplits;
+        public string useLinearRegression;
+        public string useSVMRegression;
+        public string useSVMClassification;
+    }
  }
  
  

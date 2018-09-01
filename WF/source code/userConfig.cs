@@ -78,9 +78,15 @@ namespace DataSetsSparsity
                     nonLinearHopping = Convert.ToBoolean(values[1]);
                 else if (values[0] == "nCv")
                     nCv = Convert.ToInt32(values[1]);
-                else if (values[0] == "useContNorms")
-                    useContNorms = Convert.ToBoolean(values[1]);
-                
+                else if (values[0] == "useIsotropicSplits")
+                    useIsotropicSplits = Convert.ToBoolean(values[1]);
+                else if (values[0] == "useLinearRegression")
+                    useLinearRegression = Convert.ToBoolean(values[1]);
+                else if (values[0] == "useSVMRegression")
+                    useSVMRegression = Convert.ToBoolean(values[1]);
+                else if (values[0] == "useSVMClassification")
+                    useSVMClassification = Convert.ToBoolean(values[1]);
+
             }
             sr.Close();
         }
@@ -159,7 +165,10 @@ namespace DataSetsSparsity
         static public StreamWriter logger = new StreamWriter("log.txt", false);
         static public int nCv;
         static public string nFeaturesStr;
-        static public bool useContNorms;
+        static public bool useIsotropicSplits;
+        static public bool useLinearRegression;
+        static public bool useSVMRegression;
+        static public bool useSVMClassification;
     }
  }
  

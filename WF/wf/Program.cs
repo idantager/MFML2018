@@ -48,6 +48,8 @@ namespace wf
 
         public static userConfig u_config = new userConfig();
 
+        public static bool useNewLogic = true;
+
         public static void printtable(List<int>[] table, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false);
@@ -98,8 +100,8 @@ namespace wf
                 line = decision_GeoWaveArr[i].ID.ToString() + "; " + decision_GeoWaveArr[i].child0.ToString() + "; " + decision_GeoWaveArr[i].child1.ToString() + "; ";
                 for (int j = 0; j < dataDim; j++)
                 {
-                    line += decision_GeoWaveArr[i].boubdingBox[0][j].ToString() + "; " + decision_GeoWaveArr[i].boubdingBox[1][j].ToString() + "; "
-                        + MainGrid[j][decision_GeoWaveArr[i].boubdingBox[0][j]].ToString() + "; " + MainGrid[j][decision_GeoWaveArr[i].boubdingBox[1][j]].ToString() + "; ";
+                    line += decision_GeoWaveArr[i].isotropicSplitsParameters.boundingBox[0][j].ToString() + "; " + decision_GeoWaveArr[i].isotropicSplitsParameters.boundingBox[1][j].ToString() + "; "
+                        + MainGrid[j][decision_GeoWaveArr[i].isotropicSplitsParameters.boundingBox[0][j]].ToString() + "; " + MainGrid[j][decision_GeoWaveArr[i].isotropicSplitsParameters.boundingBox[1][j]].ToString() + "; ";
                 }
                 line += decision_GeoWaveArr[i].level + "; ";
 
@@ -110,9 +112,9 @@ namespace wf
 
                 line += decision_GeoWaveArr[i].norm + "; " + decision_GeoWaveArr[i].parentID.ToString() + "; ";
 
-                line += decision_GeoWaveArr[i].dimIndex.ToString() + "; " + decision_GeoWaveArr[i].MaingridValue.ToString() + "; ";//SPLITTED
+                line += decision_GeoWaveArr[i].isotropicSplitsParameters.dimIndex.ToString() + "; " + decision_GeoWaveArr[i].isotropicSplitsParameters.maingridValue.ToString() + "; ";//SPLITTED
 
-                line += decision_GeoWaveArr[i].dimIndexSplitter.ToString() + "; " + decision_GeoWaveArr[i].splitValue.ToString();//SPLITTER
+                line += decision_GeoWaveArr[i].isotropicSplitsParameters.dimIndexSplitter.ToString() + "; " + decision_GeoWaveArr[i].isotropicSplitsParameters.splitValue.ToString();//SPLITTER
 
                 sw.WriteLine(line);
             }
@@ -125,13 +127,14 @@ namespace wf
             int dataDim = boundingBox[0].Count();
             int labelDim = decision_GeoWaveArr[0].MeanValue.Count();
 
-            sw.WriteLine("norm, level, Npoints, dimSplit, MainGridIndexSplit", "MaingridValue");
+            sw.WriteLine("norm, level, Npoints, splitType, dimSplit, MainGridIndexSplit", "maingridValue");
 
             for (int i = 0; i < decision_GeoWaveArr.Count; i++)
             {
                 sw.WriteLine(decision_GeoWaveArr[i].norm + ", " + decision_GeoWaveArr[i].level + ", " + decision_GeoWaveArr[i].pointsIdArray.Count()
-                                                         + ", " + decision_GeoWaveArr[i].dimIndex + ", " + decision_GeoWaveArr[i].Maingridindex
-                                                         + ", " + decision_GeoWaveArr[i].MaingridValue);
+                                                         + ", " + decision_GeoWaveArr[i].splitType + ", " + decision_GeoWaveArr[i].isotropicSplitsParameters.dimIndex
+                                                         + ", " + decision_GeoWaveArr[i].isotropicSplitsParameters.maingridIndex
+                                                         + ", " + decision_GeoWaveArr[i].isotropicSplitsParameters.maingridValue);
             }
 
             sw.Close();
@@ -192,7 +195,6 @@ namespace wf
             //if (userConfig.useCV)
             //    folds = new string[userConfig.nCv];
             //else
-
 
             if (userConfig.useCV && userConfig.nCv ==0)
                 userConfig.logger.WriteLine("Num of Cross validation folders wasn't provided");

@@ -31,6 +31,9 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.useIsotropicSplits = new System.Windows.Forms.CheckBox();
+            this.useSVMRegression = new System.Windows.Forms.CheckBox();
+            this.useLinearRegression = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.hopping = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -60,9 +63,7 @@
             this.minNodeSize = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.partitionType = new System.Windows.Forms.TextBox();
-            this.useContNorms = new System.Windows.Forms.TextBox();
             this.boundLevelDepth = new System.Windows.Forms.TextBox();
-            this.label24 = new System.Windows.Forms.Label();
             this.label26 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.nTrees = new System.Windows.Forms.TextBox();
@@ -72,6 +73,7 @@
             this.bagginPercent = new System.Windows.Forms.TextBox();
             this.label23 = new System.Windows.Forms.Label();
             this.errTypeTest = new System.Windows.Forms.TextBox();
+            this.useSVMClassification = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -84,6 +86,10 @@
             // groupBox1
             // 
             this.groupBox1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.groupBox1.Controls.Add(this.useSVMClassification);
+            this.groupBox1.Controls.Add(this.useIsotropicSplits);
+            this.groupBox1.Controls.Add(this.useSVMRegression);
+            this.groupBox1.Controls.Add(this.useLinearRegression);
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.hopping);
             this.groupBox1.Controls.Add(this.label4);
@@ -102,10 +108,40 @@
             this.groupBox1.Controls.Add(this.useRF);
             this.groupBox1.Location = new System.Drawing.Point(12, 110);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(299, 267);
+            this.groupBox1.Size = new System.Drawing.Size(299, 348);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Script Config";
+            // 
+            // useIsotropicSplits
+            // 
+            this.useIsotropicSplits.AutoSize = true;
+            this.useIsotropicSplits.Location = new System.Drawing.Point(6, 254);
+            this.useIsotropicSplits.Name = "useIsotropicSplits";
+            this.useIsotropicSplits.Size = new System.Drawing.Size(151, 17);
+            this.useIsotropicSplits.TabIndex = 76;
+            this.useIsotropicSplits.Text = "use isotropic patrition splits";
+            this.useIsotropicSplits.UseVisualStyleBackColor = true;
+            // 
+            // useSVMRegression
+            // 
+            this.useSVMRegression.AutoSize = true;
+            this.useSVMRegression.Location = new System.Drawing.Point(6, 300);
+            this.useSVMRegression.Name = "useSVMRegression";
+            this.useSVMRegression.Size = new System.Drawing.Size(260, 17);
+            this.useSVMRegression.TabIndex = 75;
+            this.useSVMRegression.Text = "use SVM Regression for anisotropic partition splits";
+            this.useSVMRegression.UseVisualStyleBackColor = true;
+            // 
+            // useLinearRegression
+            // 
+            this.useLinearRegression.AutoSize = true;
+            this.useLinearRegression.Location = new System.Drawing.Point(6, 277);
+            this.useLinearRegression.Name = "useLinearRegression";
+            this.useLinearRegression.Size = new System.Drawing.Size(266, 17);
+            this.useLinearRegression.TabIndex = 22;
+            this.useLinearRegression.Text = "use Linear Regression for anisotropic partition splits";
+            this.useLinearRegression.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -122,7 +158,6 @@
             this.hopping.Name = "hopping";
             this.hopping.Size = new System.Drawing.Size(60, 20);
             this.hopping.TabIndex = 74;
-            this.hopping.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             // 
             // label4
             // 
@@ -366,28 +401,12 @@
             this.partitionType.Size = new System.Drawing.Size(48, 20);
             this.partitionType.TabIndex = 17;
             // 
-            // useContNorms
-            // 
-            this.useContNorms.Location = new System.Drawing.Point(147, 202);
-            this.useContNorms.Name = "useContNorms";
-            this.useContNorms.Size = new System.Drawing.Size(48, 20);
-            this.useContNorms.TabIndex = 23;
-            // 
             // boundLevelDepth
             // 
             this.boundLevelDepth.Location = new System.Drawing.Point(147, 176);
             this.boundLevelDepth.Name = "boundLevelDepth";
             this.boundLevelDepth.Size = new System.Drawing.Size(48, 20);
             this.boundLevelDepth.TabIndex = 21;
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(6, 205);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(118, 13);
-            this.label24.TabIndex = 48;
-            this.label24.Text = "Non discrete WF norms";
             // 
             // label26
             // 
@@ -415,13 +434,11 @@
             this.groupBox4.Controls.Add(this.label8);
             this.groupBox4.Controls.Add(this.label23);
             this.groupBox4.Controls.Add(this.errTypeTest);
-            this.groupBox4.Controls.Add(this.label24);
             this.groupBox4.Controls.Add(this.boundLevelDepth);
-            this.groupBox4.Controls.Add(this.useContNorms);
             this.groupBox4.Controls.Add(this.label26);
             this.groupBox4.Location = new System.Drawing.Point(332, 18);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(218, 259);
+            this.groupBox4.Size = new System.Drawing.Size(218, 238);
             this.groupBox4.TabIndex = 21;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Parameters settings";
@@ -468,7 +485,7 @@
             // label23
             // 
             this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(6, 232);
+            this.label23.Location = new System.Drawing.Point(8, 204);
             this.label23.Name = "label23";
             this.label23.Size = new System.Drawing.Size(117, 13);
             this.label23.TabIndex = 50;
@@ -476,10 +493,20 @@
             // 
             // errTypeTest
             // 
-            this.errTypeTest.Location = new System.Drawing.Point(147, 228);
+            this.errTypeTest.Location = new System.Drawing.Point(146, 204);
             this.errTypeTest.Name = "errTypeTest";
             this.errTypeTest.Size = new System.Drawing.Size(48, 20);
             this.errTypeTest.TabIndex = 49;
+            // 
+            // useSVMClassification
+            // 
+            this.useSVMClassification.AutoSize = true;
+            this.useSVMClassification.Location = new System.Drawing.Point(6, 323);
+            this.useSVMClassification.Name = "useSVMClassification";
+            this.useSVMClassification.Size = new System.Drawing.Size(268, 17);
+            this.useSVMClassification.TabIndex = 22;
+            this.useSVMClassification.Text = "use SVM Classification for anisotropic partition splits";
+            this.useSVMClassification.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -520,13 +547,11 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox approxThresh;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.TextBox useContNorms;
         private System.Windows.Forms.TextBox boundLevelDepth;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox minNodeSize;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox partitionType;
-        private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Label label26;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TextBox nTrees;
@@ -550,6 +575,10 @@
         private System.Windows.Forms.TextBox hopping;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox m_terms;
+        private System.Windows.Forms.CheckBox useLinearRegression;
+        private System.Windows.Forms.CheckBox useSVMRegression;
+        private System.Windows.Forms.CheckBox useIsotropicSplits;
+        private System.Windows.Forms.CheckBox useSVMClassification;
     }
 }
 

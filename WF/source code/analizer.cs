@@ -162,8 +162,8 @@ namespace DataSetsSparsity
                 for (int j = 0; j < RFdecTreeArr[i].Count; j++)
                 {
                     globalNorms.Add(RFdecTreeArr[i][j].norm);
-                    if (RFdecTreeArr[i][j].dimIndex >= 0 && RFdecTreeArr[i][j].norm >= normthreshold)
-                        VI[RFdecTreeArr[i][j].dimIndex] += RFdecTreeArr[i][j].norm;
+                    if (RFdecTreeArr[i][j].isotropicSplitsParameters.dimIndex >= 0 && RFdecTreeArr[i][j].norm >= normthreshold)
+                        VI[RFdecTreeArr[i][j].isotropicSplitsParameters.dimIndex] += RFdecTreeArr[i][j].norm;
 
                 }                    
             globalNorms = globalNorms.OrderByDescending(d => d).ToList();
@@ -970,12 +970,9 @@ namespace DataSetsSparsity
 
         private double[] askTreeMeanVal(double[] point, List<GeoWave> Tree_orderedById, double NormThreshold)
         {
-
-            int counter = 0;
-            if (!DB.IsPntInsideBox(Tree_orderedById[0].boubdingBox, point, db.training_dt[0].Count()))
+            if (!DB.IsPntInsideBox(Tree_orderedById[0].isotropicSplitsParameters.boundingBox, point, db.training_dt[0].Count()))
             {
-                DB.ProjectPntInsideBox(Tree_orderedById[0].boubdingBox, ref point);
-                counter++;
+                DB.ProjectPntInsideBox(Tree_orderedById[0].isotropicSplitsParameters.boundingBox, ref point);
             }
 
             double[] zeroMean = new double[Tree_orderedById[0].MeanValue.Count()];
@@ -991,31 +988,137 @@ namespace DataSetsSparsity
 
             while (!endOfLoop)
             {
-                if (Tree_orderedById[parent_index].child0 != -1 && DB.IsPntInsideBox(Tree_orderedById[Tree_orderedById[parent_index].child0].boubdingBox, point, db.training_dt[0].Count()))
+                if (SplitType.SVM_REGRESSION_SPLITS == Tree_orderedById[parent_index].splitType)
                 {
-                    if (!Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue.SequenceEqual(zeroMean) &&
-                        NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child0].norm) //take the mean value if its not 0 and the wavelete should be taken ( norm size) - or if its the root wavelete
+                    double[] tmp_point = new double[userConfig.nFeatures];
+                    int k = 0;
+                    for (int j = 0; j < db.testing_dt[0].Length; j++)
                     {
-                        for(int t=0;t< MeanValue.Count(); t++)
-                            MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        if (Tree_orderedById[parent_index].svmRegressionSplitsParameters.Dim2TakeNode[j])
+                        {
+                            tmp_point[k] = point[j];
+                        }
                     }
+                    double prediction = Tree_orderedById[parent_index].svmRegressionSplitsParameters.svmRegression.Score(tmp_point);
+                    if (prediction >= Tree_orderedById[parent_index].svmRegressionSplitsParameters.svmRegressionSplitValue)
+                    {
+                        if (!Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue.SequenceEqual(zeroMean) &&
+                            NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child0].norm) //take the mean value if its not 0 and the wavelete should be taken ( norm size) - or if its the root wavelete
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+                        parent_index = Tree_orderedById[parent_index].child0;
 
-                    parent_index = Tree_orderedById[parent_index].child0;
+                    }
+                    else
+                    {
+                        if (NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child1].norm) //take the mean value if its above threshold
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child1].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+                        parent_index = Tree_orderedById[parent_index].child1;
+                    }
                 }
-                else if (Tree_orderedById[parent_index].child1 != -1 && DB.IsPntInsideBox(Tree_orderedById[Tree_orderedById[parent_index].child1].boubdingBox, point, db.training_dt[0].Count()))
+                else if (SplitType.LINEAR_REGRESSION_SPLITS == Tree_orderedById[parent_index].splitType)
                 {
-                    if (NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child1].norm) //take the mean value if its above threshold
+                    double[] tmp_point = new double[userConfig.nFeatures];
+                    int k = 0;
+                    for (int j = 0; j < db.testing_dt[0].Length; j++)
                     {
-                        for (int t = 0; t < MeanValue.Count(); t++)
-                            MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child1].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        if (Tree_orderedById[parent_index].linearRegressionSplitsParameters.Dim2TakeNode[j])
+                        {
+                            tmp_point[k] = point[j];
+                        }
                     }
+                    double[] prediction = Tree_orderedById[parent_index].linearRegressionSplitsParameters.linearRegression.Transform(tmp_point);
+                    if (prediction[0] >= 0)
+                    {
+                        if (!Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue.SequenceEqual(zeroMean) &&
+                            NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child0].norm) //take the mean value if its not 0 and the wavelete should be taken ( norm size) - or if its the root wavelete
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+                        parent_index = Tree_orderedById[parent_index].child0;
 
-                    parent_index = Tree_orderedById[parent_index].child1;
+                    }
+                    else
+                    {
+                        if (NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child1].norm) //take the mean value if its above threshold
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child1].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+                        parent_index = Tree_orderedById[parent_index].child1;
+                    }
+                }
+                else if (SplitType.SVM_CLASSIFICATION_SPLITS == Tree_orderedById[parent_index].splitType)
+                {
+                    double[] tmp_point = new double[userConfig.nFeatures];
+                    int k = 0;
+                    for (int j = 0; j < db.testing_dt[0].Length; j++)
+                    {
+                        if (Tree_orderedById[parent_index].svmClassificationSplitParameters.Dim2TakeNode[j])
+                        {
+                            tmp_point[k] = point[j];
+                        }
+                    }
+                    bool prediction = Tree_orderedById[parent_index].svmClassificationSplitParameters.svm.Decide(tmp_point);
+                    if (prediction)
+                    {
+                        if (!Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue.SequenceEqual(zeroMean) &&
+                            NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child0].norm) //take the mean value if its not 0 and the wavelete should be taken ( norm size) - or if its the root wavelete
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+                        parent_index = Tree_orderedById[parent_index].child0;
+
+                    }
+                    else
+                    {
+                        if (NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child1].norm) //take the mean value if its above threshold
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child1].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+                        parent_index = Tree_orderedById[parent_index].child1;
+                    }
+                }
+                else if (SplitType.REGULAR_ISOTROPIC_SPLITS == Tree_orderedById[parent_index].splitType)
+                {
+                    if (Tree_orderedById[parent_index].child0 != -1 && DB.IsPntInsideBox(Tree_orderedById[Tree_orderedById[parent_index].child0].isotropicSplitsParameters.boundingBox, point, db.training_dt[0].Count()))
+                    {
+                        if (!Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue.SequenceEqual(zeroMean) &&
+                            NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child0].norm) //take the mean value if its not 0 and the wavelete should be taken ( norm size) - or if its the root wavelete
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child0].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+
+                        parent_index = Tree_orderedById[parent_index].child0;
+                    }
+                    else if (Tree_orderedById[parent_index].child1 != -1 && DB.IsPntInsideBox(Tree_orderedById[Tree_orderedById[parent_index].child1].isotropicSplitsParameters.boundingBox, point, db.training_dt[0].Count()))
+                    {
+                        if (NormThreshold <= Tree_orderedById[Tree_orderedById[parent_index].child1].norm) //take the mean value if its above threshold
+                        {
+                            for (int t = 0; t < MeanValue.Count(); t++)
+                                MeanValue[t] += (Tree_orderedById[Tree_orderedById[parent_index].child1].MeanValue[t] - Tree_orderedById[parent_index].MeanValue[t]);
+                        }
+
+                        parent_index = Tree_orderedById[parent_index].child1;
+                    }
                 }
                 else
+                {
                     endOfLoop = true;
+                }
+
             }
-            return MeanValue;
+
+            return MeanValue;           
         }
 
         private double testDecisionForest(List<int> testingArr, double[][] Data_table, double[][] Data_Lables, List<GeoWave>[] RFdecTreeArrById, double NormThreshold, string NormLPTypeInEstimation, bool Sort)

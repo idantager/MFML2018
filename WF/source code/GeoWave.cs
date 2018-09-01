@@ -1,25 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Accord.Statistics.Models.Regression.Linear;
+using Accord.Statistics.Kernels;
+using Accord.MachineLearning.VectorMachines;
 
 namespace DataSetsSparsity
 {
+    public enum SplitType
+    {
+        NO_SPLIT,
+        REGULAR_ISOTROPIC_SPLITS,
+        LINEAR_REGRESSION_SPLITS,
+        SVM_REGRESSION_SPLITS,
+        SVM_CLASSIFICATION_SPLITS
+    }
+
+    public class IsotropicSplitsParameters
+    {
+        public int[][] boundingBox;
+        public int dimIndex;
+        public int maingridIndex;
+        public double maingridValue;
+        public int dimIndexSplitter;
+        public double splitValue;
+
+        public IsotropicSplitsParameters(int dataDim, int labelDim)
+        {
+            boundingBox = new int[2][];
+            boundingBox[0] = new int[dataDim];
+            boundingBox[1] = new int[dataDim];
+            dimIndex = -1;
+            maingridIndex = -1;
+            maingridValue = -1;
+        }
+    }
+
+    public class LinearRegressionSplitsParameters
+    {
+        public MultivariateLinearRegression linearRegression;
+        public bool[] Dim2TakeNode;
+    }
+
+    public class SVMRegressionSplitsParameters
+    {
+        public SupportVectorMachine<Linear> svmRegression;
+        public double svmRegressionSplitValue;
+        public int labelIdx;
+        public bool[] Dim2TakeNode;
+    }
+
+    public class SVMClassificationSplitParameters
+    {
+        public SupportVectorMachine<Gaussian> svm;
+        public bool[] Dim2TakeNode;
+    }
+
     public class GeoWave
     {
+        public int ID;
         public int parentID, child0, child1, level;
-        public double proximity;
-        public double volume;
         public double norm;
         public double[] MeanValue; //vector with means at each dimention
-        public int[][] boubdingBox;
         public List<int> pointsIdArray = new List<int>();//points in regeion (row index of static input data)
-        public int ID;
-        public int dimIndex;//of partition
-        public int Maingridindex;//of partition
-        public double MaingridValue;//of partition
-        public int dimIndexSplitter;//of partition
-        public double splitValue;//of partition
-
+        public SplitType splitType;
+        public IsotropicSplitsParameters isotropicSplitsParameters;
+        public LinearRegressionSplitsParameters linearRegressionSplitsParameters;
+        public SVMRegressionSplitsParameters svmRegressionSplitsParameters;
+        public SVMClassificationSplitParameters svmClassificationSplitParameters;
         public GeoWave(int dataDim, int labelDim)
         {
             Init(dataDim, labelDim);
@@ -32,28 +80,22 @@ namespace DataSetsSparsity
             child1 = -1;
             level = -1;
             norm = -1;
-            //approx_solution = new double[dataDim, labelDim];
-            boubdingBox = new int[2][];
-            boubdingBox[0] = new int[dataDim];
-            boubdingBox[1] = new int[dataDim];
-
             MeanValue = new double[labelDim];
             ID = -1;
-            dimIndex = -1;
-            Maingridindex = -1;
-            MaingridValue = -1;
+            splitType = SplitType.NO_SPLIT;
+            isotropicSplitsParameters = new IsotropicSplitsParameters(dataDim, labelDim);
+            svmRegressionSplitsParameters = new SVMRegressionSplitsParameters();
+            linearRegressionSplitsParameters = new LinearRegressionSplitsParameters();
+            svmClassificationSplitParameters = new SVMClassificationSplitParameters();
         }
 
         public GeoWave(int[][] BOX, int labelDim)
         {
             Init(BOX[0].Count(), labelDim);
-            volume = 1;
-            for (int j = 0; j < boubdingBox[0].Count(); j++)
+            for (int j = 0; j < isotropicSplitsParameters.boundingBox[0].Count(); j++)
             {
-                boubdingBox[0][j] = BOX[0][j];
-                boubdingBox[1][j] = BOX[1][j];
-                volume *= (wf.Program.MainGrid[j].ElementAt(boubdingBox[1][j])-
-                           wf.Program.MainGrid[j].ElementAt(boubdingBox[0][j]));
+                isotropicSplitsParameters.boundingBox[0][j] = BOX[0][j];
+                isotropicSplitsParameters.boundingBox[1][j] = BOX[1][j];
             }        
         }
 
@@ -170,67 +212,49 @@ namespace DataSetsSparsity
         public void computeNormOfConsts(GeoWave parent, double Lp)
         {
             norm = 0;
-            if (userConfig.useContNorms)
-            {
-                volume = 1;
-                for (int j = 0; j < boubdingBox[0].Count(); j++)
-                {
-                    volume *= (wf.Program.MainGrid[j].ElementAt(boubdingBox[1][j]) -
-                               wf.Program.MainGrid[j].ElementAt(boubdingBox[0][j]));
-                }
-            }
             //GO OVER ALL POINTS IN THE REGION
             if (Lp == 2)
             {
                 for (int j = 0; j < MeanValue.Count(); j++)
                     norm += ((MeanValue[j] - parent.MeanValue[j]) * (MeanValue[j] - parent.MeanValue[j]));
-                norm *= userConfig.useContNorms ? volume : pointsIdArray.Count();
+                norm *= pointsIdArray.Count();
                 norm = Math.Sqrt(norm);
             }
             else if (Lp == 1)
             {
                 for (int j = 0; j < MeanValue.Count(); j++)
                     norm += Math.Abs(MeanValue[j] - parent.MeanValue[j]);
-                norm *= userConfig.useContNorms ? volume : pointsIdArray.Count();
+                norm *= pointsIdArray.Count();
             }
             else
             {
                 for (int j = 0; j < MeanValue.Count(); j++)
                     norm += Math.Pow(MeanValue[j] - parent.MeanValue[j], Lp);
                 norm = norm * pointsIdArray.Count();
-                norm *= userConfig.useContNorms ? volume : pointsIdArray.Count();
+                norm *= pointsIdArray.Count();
             }
         }
         public void computeNormOfConsts(double Lp)
         {
-            if (userConfig.useContNorms)
-            {
-                volume = 1;
-                for (int j = 0; j < boubdingBox[0].Count(); j++)
-                {
-                    volume *= (wf.Program.MainGrid[j].ElementAt(boubdingBox[1][j]) -
-                               wf.Program.MainGrid[j].ElementAt(boubdingBox[0][j]));
-                }
-            }
             norm = 0;
             if (Lp == 2)
             {
                 for (int j = 0; j < MeanValue.Count(); j++)
                     norm += (MeanValue[j] * MeanValue[j]);
-                norm *= userConfig.useContNorms ? volume : pointsIdArray.Count();
+                norm *= pointsIdArray.Count();
                 norm = Math.Sqrt(norm);
             }
             else if (Lp == 1)
             {
                 for (int j = 0; j < MeanValue.Count(); j++)
                     norm += Math.Abs(MeanValue[j]);
-                norm *= userConfig.useContNorms ? volume : pointsIdArray.Count();
+                norm *= pointsIdArray.Count();
             }
             else
             {
                 for (int j = 0; j < MeanValue.Count(); j++)
                     norm += Math.Pow(MeanValue[j], Lp);
-                norm *= userConfig.useContNorms ? volume : pointsIdArray.Count();
+                norm *= pointsIdArray.Count();
                 norm = Math.Pow(norm, 1 / Lp);
             }
             

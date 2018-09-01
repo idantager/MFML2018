@@ -157,6 +157,14 @@ namespace DataSetsSparsity
                 saveTrees.Checked = true;
             if (u_config.testRF == "true")
                 testRF.Checked = true;
+            if (u_config.useIsotropicSplits == "true")
+                useIsotropicSplits.Checked = true;
+            if (u_config.useLinearRegression == "true")
+                useLinearRegression.Checked = true;
+            if (u_config.useSVMRegression == "true")
+                useSVMRegression.Checked = true;
+            if (u_config.useSVMClassification == "true")
+                useSVMClassification.Checked = true;
             if (u_config.evaluateSmoothness == "true")
                 evaluateSmoothness.Checked = true;
             if (u_config.testWf == "true")
@@ -169,7 +177,6 @@ namespace DataSetsSparsity
             approxThresh.Text = u_config.approxThresh;
             minNodeSize.Text = u_config.minNodeSize;
             partitionType.Text = u_config.partitionType;
-            useContNorms.Text = u_config.useContNorms;
             boundLevelDepth.Text = u_config.boundLevelDepth;
             errTypeTest.Text = u_config.errTypeTest;
             nTrees.Text = u_config.nTrees;
@@ -194,12 +201,15 @@ namespace DataSetsSparsity
             u_config.setInhyperCube = setInhyperCube.Checked ? "true" : "false";
             u_config.nonLinearHopping = useRF.Checked ? "true" : "false";
             u_config.testRF = testRF.Checked ? "true" : "false";
+            u_config.useIsotropicSplits = useIsotropicSplits.Checked ? "true" : "false";
+            u_config.useLinearRegression = useLinearRegression.Checked ? "true" : "false";
+            u_config.useSVMRegression = useSVMRegression.Checked ? "true" : "false";
+            u_config.useSVMClassification = useSVMClassification.Checked ? "true" : "false";
             u_config.dbPath = dbPath.Text;
             u_config.resultsPath = resultsPath.Text;
             u_config.approxThresh = approxThresh.Text;
             u_config.minNodeSize = minNodeSize.Text;
             u_config.partitionType = partitionType.Text;
-            u_config.useContNorms = useContNorms.Text;
             u_config.boundLevelDepth = boundLevelDepth.Text;
             u_config.errTypeTest = errTypeTest.Text;
             u_config.nTrees = nTrees.Text;
@@ -219,11 +229,6 @@ namespace DataSetsSparsity
             {
                 body.Invoke(i);
             }
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
