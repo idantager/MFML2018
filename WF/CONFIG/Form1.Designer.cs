@@ -31,6 +31,7 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.useSVMClassification = new System.Windows.Forms.CheckBox();
             this.useIsotropicSplits = new System.Windows.Forms.CheckBox();
             this.useSVMRegression = new System.Windows.Forms.CheckBox();
             this.useLinearRegression = new System.Windows.Forms.CheckBox();
@@ -73,7 +74,7 @@
             this.bagginPercent = new System.Windows.Forms.TextBox();
             this.label23 = new System.Windows.Forms.Label();
             this.errTypeTest = new System.Windows.Forms.TextBox();
-            this.useSVMClassification = new System.Windows.Forms.CheckBox();
+            this.useGiniIndex = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -86,6 +87,7 @@
             // groupBox1
             // 
             this.groupBox1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.groupBox1.Controls.Add(this.useGiniIndex);
             this.groupBox1.Controls.Add(this.useSVMClassification);
             this.groupBox1.Controls.Add(this.useIsotropicSplits);
             this.groupBox1.Controls.Add(this.useSVMRegression);
@@ -108,10 +110,20 @@
             this.groupBox1.Controls.Add(this.useRF);
             this.groupBox1.Location = new System.Drawing.Point(12, 110);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(299, 348);
+            this.groupBox1.Size = new System.Drawing.Size(299, 372);
             this.groupBox1.TabIndex = 20;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Script Config";
+            // 
+            // useSVMClassification
+            // 
+            this.useSVMClassification.AutoSize = true;
+            this.useSVMClassification.Location = new System.Drawing.Point(6, 346);
+            this.useSVMClassification.Name = "useSVMClassification";
+            this.useSVMClassification.Size = new System.Drawing.Size(268, 17);
+            this.useSVMClassification.TabIndex = 22;
+            this.useSVMClassification.Text = "use SVM Classification for anisotropic partition splits";
+            this.useSVMClassification.UseVisualStyleBackColor = true;
             // 
             // useIsotropicSplits
             // 
@@ -126,7 +138,7 @@
             // useSVMRegression
             // 
             this.useSVMRegression.AutoSize = true;
-            this.useSVMRegression.Location = new System.Drawing.Point(6, 300);
+            this.useSVMRegression.Location = new System.Drawing.Point(6, 323);
             this.useSVMRegression.Name = "useSVMRegression";
             this.useSVMRegression.Size = new System.Drawing.Size(260, 17);
             this.useSVMRegression.TabIndex = 75;
@@ -136,7 +148,7 @@
             // useLinearRegression
             // 
             this.useLinearRegression.AutoSize = true;
-            this.useLinearRegression.Location = new System.Drawing.Point(6, 277);
+            this.useLinearRegression.Location = new System.Drawing.Point(6, 300);
             this.useLinearRegression.Name = "useLinearRegression";
             this.useLinearRegression.Size = new System.Drawing.Size(266, 17);
             this.useLinearRegression.TabIndex = 22;
@@ -498,15 +510,15 @@
             this.errTypeTest.Size = new System.Drawing.Size(48, 20);
             this.errTypeTest.TabIndex = 49;
             // 
-            // useSVMClassification
+            // useGiniIndex
             // 
-            this.useSVMClassification.AutoSize = true;
-            this.useSVMClassification.Location = new System.Drawing.Point(6, 323);
-            this.useSVMClassification.Name = "useSVMClassification";
-            this.useSVMClassification.Size = new System.Drawing.Size(268, 17);
-            this.useSVMClassification.TabIndex = 22;
-            this.useSVMClassification.Text = "use SVM Classification for anisotropic partition splits";
-            this.useSVMClassification.UseVisualStyleBackColor = true;
+            this.useGiniIndex.AutoSize = true;
+            this.useGiniIndex.Location = new System.Drawing.Point(6, 277);
+            this.useGiniIndex.Name = "useGiniIndex";
+            this.useGiniIndex.Size = new System.Drawing.Size(261, 17);
+            this.useGiniIndex.TabIndex = 22;
+            this.useGiniIndex.Text = "use gini index classification isotropic partition splits";
+            this.useGiniIndex.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -579,6 +591,7 @@
         private System.Windows.Forms.CheckBox useSVMRegression;
         private System.Windows.Forms.CheckBox useIsotropicSplits;
         private System.Windows.Forms.CheckBox useSVMClassification;
+        private System.Windows.Forms.CheckBox useGiniIndex;
     }
 }
 

@@ -86,6 +86,8 @@ namespace DataSetsSparsity
                     useSVMRegression = Convert.ToBoolean(values[1]);
                 else if (values[0] == "useSVMClassification")
                     useSVMClassification = Convert.ToBoolean(values[1]);
+                else if (values[0] == "useGiniIndex")
+                    useGiniIndex = Convert.ToBoolean(values[1]);
 
             }
             sr.Close();
@@ -169,6 +171,7 @@ namespace DataSetsSparsity
         static public bool useLinearRegression;
         static public bool useSVMRegression;
         static public bool useSVMClassification;
+        static public bool useGiniIndex;
     }
  }
  

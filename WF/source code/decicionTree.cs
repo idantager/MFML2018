@@ -6,7 +6,6 @@ using Accord.Statistics.Models.Regression.Linear;
 using Accord.MachineLearning.VectorMachines.Learning;
 using Accord.Statistics.Kernels;
 using Accord.MachineLearning.VectorMachines;
-using Accord.Math.Distances;
 
 namespace DataSetsSparsity
 {
@@ -28,6 +27,18 @@ namespace DataSetsSparsity
                 this.error = error;
                 this.child0 = child0;
                 this.child1 = child1;
+            }
+        }
+
+        private class IsotropicSplitData : SplitData
+        {
+            public int dimIndex;
+            public double splitValue;
+
+            public IsotropicSplitData(double error, GeoWave child0, GeoWave child1, int dimIndex, double splitValue) : base(error, child0, child1)
+            {
+                this.dimIndex = dimIndex;
+                this.splitValue = splitValue;
             }
         }
 
@@ -171,10 +182,6 @@ namespace DataSetsSparsity
             child1.isotropicSplitsParameters.maingridIndex = Maingridindex;
             child0.isotropicSplitsParameters.maingridValue = wf.Program.MainGrid[dimIndex][Maingridindex];
             child1.isotropicSplitsParameters.maingridValue = wf.Program.MainGrid[dimIndex][Maingridindex];
-
-            //DOCUMENT ON PARENT
-            currentWave.isotropicSplitsParameters.dimIndexSplitter = dimIndex;
-            currentWave.isotropicSplitsParameters.splitValue = wf.Program.MainGrid[dimIndex][Maingridindex];
             
             if (wf.Program.IsBoxSingular(child0.isotropicSplitsParameters.boundingBox, training_dt[0].Count()) || wf.Program.IsBoxSingular(child1.isotropicSplitsParameters.boundingBox, training_dt[0].Count()))
                 return;
@@ -183,7 +190,7 @@ namespace DataSetsSparsity
 
             setChildrensPointsAndMeanValue(ref child0, ref child1, dimIndex, currentWave.pointsIdArray);
 
-            splitsData.Add(SplitType.REGULAR_ISOTROPIC_SPLITS, new SplitData(error, child0, child1));
+            splitsData.Add(SplitType.REGULAR_ISOTROPIC_SPLITS, new IsotropicSplitData(error, child0, child1, dimIndex, wf.Program.MainGrid[dimIndex][Maingridindex]));
         }
 
         private void doSvmClassificationSplit(GeoWave currentWave, Dictionary<SplitType, SplitData> splitsData, double currentError,
@@ -205,6 +212,54 @@ namespace DataSetsSparsity
                 return;
             }
             splitsData.Add(SplitType.SVM_CLASSIFICATION_SPLITS, new SplitData(error, child0, child1));
+        }
+
+        private void doGiniIndexIsotropicSplit(GeoWave currentWave, Dictionary<SplitType, SplitData> splitsData,
+            double currentError, bool[] Dim2TakeNode)
+        {
+            int dimIndex = -1;
+            int Maingridindex = -1;
+            bool isSplitOk = getGiniPartitionResult(ref dimIndex, ref Maingridindex, currentWave, Dim2TakeNode);
+            if (!isSplitOk)
+            {
+                for (int i = 0; i < Dim2TakeNode.Count(); i++)
+                    Dim2TakeNode[i] = (Dim2TakeNode[i] == true) ? false : true;
+                isSplitOk = getGiniPartitionResult(ref dimIndex, ref Maingridindex, currentWave, Dim2TakeNode);
+                if (!isSplitOk)
+                    return;
+            }
+
+            GeoWave child0 = new GeoWave(currentWave.isotropicSplitsParameters.boundingBox, training_label[0].Count());
+            GeoWave child1 = new GeoWave(currentWave.isotropicSplitsParameters.boundingBox, training_label[0].Count());
+
+            //set partition
+            child0.isotropicSplitsParameters.boundingBox[1][dimIndex] = Maingridindex;
+            child1.isotropicSplitsParameters.boundingBox[0][dimIndex] = Maingridindex;
+
+            //DOCUMENT ON CHILDREN
+            child0.isotropicSplitsParameters.dimIndex = dimIndex;
+            child0.isotropicSplitsParameters.maingridIndex = Maingridindex;
+            child1.isotropicSplitsParameters.dimIndex = dimIndex;
+            child1.isotropicSplitsParameters.maingridIndex = Maingridindex;
+            child0.isotropicSplitsParameters.maingridValue = wf.Program.MainGrid[dimIndex][Maingridindex];
+            child1.isotropicSplitsParameters.maingridValue = wf.Program.MainGrid[dimIndex][Maingridindex];
+            
+            if (wf.Program.IsBoxSingular(child0.isotropicSplitsParameters.boundingBox, training_dt[0].Count()) || wf.Program.IsBoxSingular(child1.isotropicSplitsParameters.boundingBox, training_dt[0].Count()))
+                return;
+
+            //SHOULD I VERIFY THAT THE CHILD IS NOT ITS PARENT ? (IN CASES WHERE CAN'T MODEFY THE PARTITION)
+
+            setChildrensPointsAndMeanValue(ref child0, ref child1, dimIndex, currentWave.pointsIdArray);
+
+            double error = child0.calc_MeanValueReturnError(training_label, child0.pointsIdArray) +
+                           child1.calc_MeanValueReturnError(training_label, child1.pointsIdArray);
+
+            if (error >= currentError)
+            {
+                return;
+            }
+
+            splitsData.Add(SplitType.GINI_INDEX_ISOTROPIC_CLASSIFICATION_SPLITS, new IsotropicSplitData(error, child0, child1, dimIndex, wf.Program.MainGrid[dimIndex][Maingridindex]));
         }
 
         private void recursiveBSP_WaveletsByConsts(List<GeoWave> GeoWaveArr, int GeoWaveID, int seed=0)
@@ -240,6 +295,10 @@ namespace DataSetsSparsity
             {
                 doSvmClassificationSplit(currentWave, splitsData, Error, Dim2TakeNode);
             }
+            if (true)
+            {
+                doGiniIndexIsotropicSplit(currentWave, splitsData, Error, Dim2TakeNode);
+            }
 
             SplitType bestSplitType = SplitType.NO_SPLIT;
             double lowestError = Error;
@@ -258,6 +317,12 @@ namespace DataSetsSparsity
                 return;
             }
             currentWave.splitType = bestSplitType;
+            if (SplitType.REGULAR_ISOTROPIC_SPLITS == currentWave.splitType || SplitType.GINI_INDEX_ISOTROPIC_CLASSIFICATION_SPLITS == currentWave.splitType)
+            {
+                IsotropicSplitData splitData = (IsotropicSplitData) splitsData[currentWave.splitType];
+                currentWave.isotropicSplitsParameters.dimIndexSplitter = splitData.dimIndex;
+                currentWave.isotropicSplitsParameters.splitValue = splitData.splitValue;
+            }
 
             GeoWave child0 = splitsData[bestSplitType].child0;
             GeoWave child1 = splitsData[bestSplitType].child1;
@@ -577,7 +642,7 @@ namespace DataSetsSparsity
             return error_n_point;
         }
 
-        private bool GetGiniPartitionResult(ref int dimIndex, ref int Maingridindex, List<GeoWave> GeoWaveArr, int GeoWaveID, double Error, bool[] Dims2Take)
+        private bool getGiniPartitionResult(ref int dimIndex, ref int Maingridindex, GeoWave geoWave, bool[] Dims2Take)
         {
             double[][] error_dim_partition = new double[2][];//information gain, maingridIndex
             error_dim_partition[0] = new double[training_dt[0].Count()];
@@ -590,7 +655,7 @@ namespace DataSetsSparsity
                 {
                     if (Dims2Take[i])
                     {
-                        double[] tmpResult = getGiniPartitionLargeDB(i, GeoWaveArr[GeoWaveID]);
+                        double[] tmpResult = getGiniPartitionLargeDB(i, geoWave);
                         error_dim_partition[0][i] = tmpResult[0];//information gain
                         error_dim_partition[1][i] = tmpResult[1];//maingridIndex                    
                     }
@@ -607,7 +672,7 @@ namespace DataSetsSparsity
                 {
                     if (Dims2Take[i])
                     {
-                        double[] tmpResult = getGiniPartitionLargeDB(i, GeoWaveArr[GeoWaveID]);
+                        double[] tmpResult = getGiniPartitionLargeDB(i, geoWave);
                         error_dim_partition[0][i] = tmpResult[0];//information gain
                         error_dim_partition[1][i] = tmpResult[1];//maingridIndex                    
                     }

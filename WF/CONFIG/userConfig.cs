@@ -89,6 +89,8 @@ namespace DataSetsSparsity
                     useSVMRegression = values[1];
                 else if (values[0] == "useSVMClassification")
                     useSVMClassification = values[1];
+                else if (values[0] == "useGiniIndex")
+                    useGiniIndex = values[1];
 
             }
             sr.Close();
@@ -140,6 +142,7 @@ namespace DataSetsSparsity
             sw.WriteLine("useLinearRegression" + "," + useLinearRegression);
             sw.WriteLine("useSVMRegression" + "," + useSVMRegression);
             sw.WriteLine("useSVMClassification" + "," + useSVMClassification);
+            sw.WriteLine("useGiniIndex" + "," + useGiniIndex);
 
             sw.Close();
         }
@@ -177,6 +180,7 @@ namespace DataSetsSparsity
         public string useLinearRegression;
         public string useSVMRegression;
         public string useSVMClassification;
+        public string useGiniIndex;
     }
  }
  

@@ -165,6 +165,8 @@ namespace DataSetsSparsity
                 useSVMRegression.Checked = true;
             if (u_config.useSVMClassification == "true")
                 useSVMClassification.Checked = true;
+            if (u_config.useGiniIndex == "true")
+                useGiniIndex.Checked = true;
             if (u_config.evaluateSmoothness == "true")
                 evaluateSmoothness.Checked = true;
             if (u_config.testWf == "true")
@@ -205,6 +207,7 @@ namespace DataSetsSparsity
             u_config.useLinearRegression = useLinearRegression.Checked ? "true" : "false";
             u_config.useSVMRegression = useSVMRegression.Checked ? "true" : "false";
             u_config.useSVMClassification = useSVMClassification.Checked ? "true" : "false";
+            u_config.useGiniIndex = useGiniIndex.Checked ? "true" : "false";
             u_config.dbPath = dbPath.Text;
             u_config.resultsPath = resultsPath.Text;
             u_config.approxThresh = approxThresh.Text;
