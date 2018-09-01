@@ -47,8 +47,6 @@ namespace DataSetsSparsity
                     minNodeSize = values[1];
                 else if (values[0] == "partitionType")
                     partitionType = values[1];
-                else if (values[0] == "useContNorms")
-                    useContNorms = values[1];
                 else if (values[0] == "boundLevelDepth")
                     boundLevelDepth = values[1];
                 else if (values[0] == "nTrees")
@@ -119,7 +117,6 @@ namespace DataSetsSparsity
             sw.WriteLine("approxThresh" + "," + approxThresh);
             sw.WriteLine("minNodeSize" + "," + minNodeSize);
             sw.WriteLine("partitionType" + "," + partitionType);
-            sw.WriteLine("useContNorms" + "," + useContNorms);
             sw.WriteLine("boundLevelDepth" + "," + boundLevelDepth);
             sw.WriteLine("errTypeTest" + "," + errTypeTest);
             sw.WriteLine("trainingPercentTB" + "," + trainingPercentTB);
@@ -157,7 +154,6 @@ namespace DataSetsSparsity
         public string approxThresh;
         public string minNodeSize;
         public string partitionType;
-        public string useContNorms;
         public string boundLevelDepth;
         public string errTypeTest;
         public string trainingPercentTB;
