@@ -17,7 +17,7 @@ namespace wf
             userConfig.logger.Close();
             //var directories = Directory.GetDirectories(@"C:\Users\Oren E\Documents\Visual Studio 2015\Projects\wf\procDataSets\classification");
             //var directories = Directory.GetDirectories(@"C:\Users\Oren E\Documents\Visual Studio 2015\Projects\wf\dataSets\cifar10\layer4");
-            var directories = Directory.GetDirectories(@"C:\Users\Oren E\Google Drive\phd\spiralTest");     
+            var directories = Directory.GetDirectories(@"C:\idant\MFML2018\WF\db\spiralTest\");     
             //var directories = Directory.GetDirectories(@"C: \Users\Oren E\Documents\Visual Studio 2015\Projects\wf\procDataSets\regression");
             foreach (string dir in directories)
             {
@@ -157,6 +157,7 @@ namespace wf
         static private void Run()
         {
             //READ DATA
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             DB db = new DB();
             db.training_label = db.getDataTable(userConfig.dbPath + "\\trainingLabel.txt");
             if (userConfig.setInhyperCube)
@@ -243,8 +244,11 @@ namespace wf
                     analizer Analizer = new analizer(fold_path, MainGrid, db);
                     Analizer.analize(trainingFoldId[i], testingFoldId[i], validatingFoldId[i], BB);//cross validation
                 }
-                    
             }
+            watch.Stop();
+            long elapsedMs = watch.ElapsedMilliseconds;
+            string file_path = userConfig.resultsPath + "\\" + "time.txt";
+            File.AppendAllLines(file_path, new[] { String.Format("{0}", elapsedMs) });
         }
 
         private static void makeSureNoIntersection(List<int> list1, List<int> list2, List<int> list3)
