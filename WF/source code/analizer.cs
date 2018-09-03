@@ -997,6 +997,7 @@ namespace DataSetsSparsity
                         if (Tree_orderedById[parent_index].svmRegressionSplitsParameters.Dim2TakeNode[j])
                         {
                             tmp_point[k] = point[j];
+                            k++;
                         }
                     }
                     double prediction = Tree_orderedById[parent_index].svmRegressionSplitsParameters.svmRegression.Score(tmp_point);
@@ -1030,6 +1031,7 @@ namespace DataSetsSparsity
                         if (Tree_orderedById[parent_index].linearRegressionSplitsParameters.Dim2TakeNode[j])
                         {
                             tmp_point[k] = point[j];
+                            k++;
                         }
                     }
                     double[] prediction = Tree_orderedById[parent_index].linearRegressionSplitsParameters.linearRegression.Transform(tmp_point);
@@ -1063,6 +1065,7 @@ namespace DataSetsSparsity
                         if (Tree_orderedById[parent_index].svmClassificationSplitParameters.Dim2TakeNode[j])
                         {
                             tmp_point[k] = point[j];
+                            k++;
                         }
                     }
                     bool prediction = Tree_orderedById[parent_index].svmClassificationSplitParameters.svm.Decide(tmp_point);
