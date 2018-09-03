@@ -1090,7 +1090,8 @@ namespace DataSetsSparsity
                         parent_index = Tree_orderedById[parent_index].child1;
                     }
                 }
-                else if (SplitType.REGULAR_ISOTROPIC_SPLITS == Tree_orderedById[parent_index].splitType)
+                else if (SplitType.REGULAR_ISOTROPIC_SPLITS == Tree_orderedById[parent_index].splitType || 
+                        SplitType.GINI_INDEX_ISOTROPIC_CLASSIFICATION_SPLITS == Tree_orderedById[parent_index].splitType)
                 {
                     if (Tree_orderedById[parent_index].child0 != -1 && DB.IsPntInsideBox(Tree_orderedById[Tree_orderedById[parent_index].child0].isotropicSplitsParameters.boundingBox, point, db.training_dt[0].Count()))
                     {
